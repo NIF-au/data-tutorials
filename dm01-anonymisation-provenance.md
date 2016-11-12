@@ -22,7 +22,7 @@ As per the Neurodebian download site, the default username and password that are
 The example data for this tutorial should then be downloaded within the Virtual Machine usine the inbuilt browser or via wget on the command line:
  
     $ cd ~/Desktop
-    $ wget https://github.com/NIF-au/data-tutorials/blob/master/dm01-examples.tar.gz
+    $ wget https://github.com/NIF-au/data-tutorials/raw/master/dm01-examples.tar.gz
 
 Then unzip the example files in your NeuroDebian instance:
 
@@ -50,12 +50,26 @@ Check that itksnap is working by either selecting itksnap from the application m
 It is a good habit to get into using the command line to install packages as it will allow you to keep a record of which 
 packages you need for an analysis, for example to install both minc-tools and itksnap you can do this:
 
-    $ sudo apt-get install minc-tools itksnap
+    $ sudo apt-get install minc-tools itksnap fsl-complete dicomnifti
 
-apt-get will install any needed package dependencies as part of the install process. You can also get an idea of which 
-packages (and versions) are currently installed using the dpkg command:
+apt-get will install any needed package dependencies as part of the install process. This may take a small amount of time so you can leave this running and open a second Terminal window to continue with the tutorial. 
 
-    $ dpkg --list
+You can get an exact list of which packages (and versions) are currently installed using the dpkg command, for example use this sequence of commands to return a list of packages with the keywork atlas (grep is a unix search tool):
+
+```
+$ dpkg --list | grep atlas
+iU  fsl-atlases                                   5.0.7-2                              all          FSL's MNI152 standard space stereotaxic brain atlases
+iU  fsl-bangor-cerebellar-atlas                   5.0.7-2                              all          probabilistic atlas of the human cerebellum
+iU  fsl-harvard-oxford-atlases                    5.0.7-2                              all          probabilistic atlas of human cortical brain areas (lateralized)
+iU  fsl-jhu-dti-whitematter-atlas                 5.0.7-2                              all          human brain white-matter atlas
+iU  fsl-juelich-histological-atlas                5.0.7-2                              all          brain atlas based on cyto- and myelo-architectonic segmentations
+iU  fsl-mni-structural-atlas                      5.0.7-2                              all          hand-segmented single-subject human brain atlas
+iU  fsl-oxford-striatal-atlas                     5.0.7-2                              all          probabilistic atlas of the human brain's sub-striatal regions
+iU  fsl-oxford-thalamic-connectivity-atlas        5.0.7-2                              all          probabilistic brain atlas of thalamic white-matter connectivity
+iU  fsl-resting-connectivity-parcellation-atlases 5.0.7-2                              all          brain parcellations based on resting state connectivity
+iU  fsl-subthalamic-nucleus-atlas                 5.0.7-2                              all          probabilistic subthalamic nucleus atlas
+iU  fsl-talairach-daemon-atlas                    5.0.7-2                              all          structural anatomy labels of the Talairach atlas
+```
 
 This will allow you to rapidly build a list of installed software and versions that you have used in an analysis.
 
@@ -74,12 +88,11 @@ The DICOM medical imaging format has been used for many years in medical imaging
 
 A DICOM file is nearly always a single slice of a medical imaging dataset and a number with matching metadata (same series) are used to reconstruct a single 3D image. Each of the DICOM files will contain most of the the metadata for the entire study.
 
-There is a typical DICOM structure from a scanning session in the DICOM-examples folder on the desktop, it consists of multiple 3D and multi-slice acquisitions. First launch a Terminal window (black icon at the bottom) and then unzip the compressed BRAINIX.zip archive:
+There is a typical DICOM structure from a scanning session in the DICOM-examples folder on the desktop, it consists of multiple 3D and multi-slice acquisitions. First launch a Terminal window (black icon at the bottom) and then shift to the examples directory:
 
-    $ cd ~/Desktop/DICOM-examples/
-    $ unzip BRAINIX.zip
+    $ cd ~/Desktop/dm01-examples
 
-While viewers such as OSIRIX (OSX), Imagemagick, ImageJ and SanteDicomViewer (Windows) can view this data, we'll use the more powerfull DICOM tools in the dcmtk package to have a look at the headers.
+While viewers such as OSIRIX (OSX), Imagemagick, ImageJ and SanteDicomViewer (Windows) can view this data, we'll use the more powerfull DICOM tools in the dcmtk package to have a look at the headers. DICOM files typically use the extension .dcm or .IMA
 
 If you haven't installed the dcmtk package in neurodebian, you can do this as such:
 
@@ -87,8 +100,8 @@ If you haven't installed the dcmtk package in neurodebian, you can do this as su
 
 We can now dump all the headers of the first file as such:
 
-````
-$ dcmdump BRAINIX/BRAINIX/IRM\ cérébrale\,\ neuro-crâne/T1-3D-FFE-C\ -\ 801/IM-0001-0001.dcm
+```
+$ dcmdump BRAINX-neuro/T1-3D-FFE-C-801/IM-0001-0001.dcm
 
 # Dicom-File-Format
 ...
@@ -128,15 +141,52 @@ Note that it contains a large amount of identifying information, DICOM is organi
 
 We can also then dump all the headers of the files in a directory to a text file as such:
 
-    $ dcmdump +r --scan-directories BRAINIX > dicom-headers.txt
+    $ dcmdump +r --scan-directories BRAINIX-neuro > dicom-headers.txt
 
 The resulting file will be just over 40,000lines of text! remember that this header information is repeated for each file.
 
+## 6 Dataset conversion between Nifti, MINC and DICOM
+
+There are converters between most imaging file formats but support for all metadata differs. The most problematic is the conversion from DICOM to other formats as there is no easy way to deal with the multiple headers from multiple 2D input files that must be merged to form a 3D Nifti or MINC image.  First we can convert a DICOM series to MINC
+
+```
+$ dcm2mnc 1010_brain_mr_14_jpg/* .
+Checking file types...
+File 1010_brain_mr_14_jpg/IM-0001-0001.dcm appears to be DICOM (CD/Export).
+Parsing 32 files     |<--                                                  -------------------------------------------------->
+Sorting 32 files...   Done sorting files.
+Processing files, one series at a time...
+-Parsing series info |<--                                                  -------------------------------------------------->
+-Creating minc file  |<--                                                  -------------------------------------------------->
+Done processing files.
+```
+The output MINC file will be put in the current directory (the '.' in the input command line). We can determine basic information from the file via the mincinfo command:
+
+```
+$ mincinfo brain_mr_20080801_000000/brain_mr_20080801_000000_14e1_mri.mnc 
+file: brain_mr_20080801_000000/brain_mr_20080801_000000_14e1_mri.mnc
+image: unsigned short 0 to 4095
+image dimensions: zspace yspace xspace
+    dimension name         length         step        start
+    --------------         ------         ----        -----
+    zspace                     32            5     -49.3523
+    yspace                    256    -0.898438      144.349
+    xspace                    216    -0.898438      94.6099
+```
+
+We can then convert from MINC to Nifti:
+
+   $ mnc2nii brain_mr_20080801_000000/brain_mr_20080801_000000_14e1_mri.mnc  result.nii
+   
+There is also the dicomnifit package that allows you to convert direct from DICOM to Nifto:
+
+   $ dinifit <input-dir> <output.nii>
+   
 ## 5 How to anonymise (DICOM, MINC, Nifti)
 
-In order to anonymise data we can use the dcmodify tool (from dcmtk). In the first example we will remove the Patient birth date:
+In order to anonymise **DICOM** data we can use the dcmodify tool (from dcmtk). In the first example we will remove the Patient birth date:
 
-    $ dcmodify -ea '(0010,0030)' <infile.dcm>
+    $ dcmodify -ea '(0010,0030)' <infile.IMA>
     
     $ dcmodify -ie -nb -imt -gin \
        -ea "(0010,0010)" -ea "(0010,0030)" -ea "(0008,0050)" -ea "(0020,000D)" \
@@ -146,54 +196,19 @@ In order to anonymise data we can use the dcmodify tool (from dcmtk). In the fir
 
 The above wll remove the most common tags that include identifying information (DatasetTitle, Patient birth date, Accession number, Study Instance UID, Series Instance UID, SOP Instance UID, Institution Name, Institution Address, Operator Name, Referenced SOP Instance UID, Other Patient Ids, Study ID and Image Comments). Note that this will have to run on each of the individual files that make up a DICOM series.
 
-Nifti data typically does not need anonymising beyond any details in the file name itself as the fixed sized header doesn't leave much space for such data. You can determine what 
+**Nifti** data typically does not need anonymising beyond any details in the file name itself as the fixed sized header doesn't leave much space for such data. You can determine what is in the header via the fslhd command:
 
+   $ . /etc/fs/fsl.sh
+   $ fslhd result.nii
 
-## 6 Dataset conversion between Nifti, MINC and DICOM
+The only free form text field is the "descrip" field that typically contains the last command run on a file
 
-#6.5 - File naming, no spaces, no blah blah
-      - windows vs linux vs OSX (case sensitive)
+The best way to anonymise a **MINC** file is to not include the identifying information when converting
 
-#7 - Differences in metadata
-      - NIFTI
-      - MINC
-      - ISMRMRD - wget https://sourceforge.net/projects/ismrmrd/files/data/simple_gre.h5
-      - https://ismrmrd.github.io/
+   $ dcm2nii -anon <input_dir> <output_dir>
+   
+There are MINC tools specifically written to anonymise a MINC file such as mincanon and mincclean, you can see what is in the header of a MINC file as such:
 
-#8 - provenance in MINC file vs Nifti (no metadata so have to use script)
-
-#9 - Create releasable fileset
-   - always include code versions with data
-      - how to get the versions of packages you are using (dpkg -- list)
-   - always include parameters with data
-   - be sure to clean history from data (anonymise)
-      - perhaps best is via Nifti
-
-#9.1 - learn to script (bash)
-
-#10 - versioning
-
-#11 - Brief introduction to Licencing
-
-#12 - upload to figshare/mendelay?
-      - self host? (bad)
-      - let's use github
-
-#13 - create a simple github repo (online)
-      - intialise with files
-      - add README.md + COPYING.md
-      - Add versioning via tags
-      - Note how versioning turns into release
-
-#14 - create a DOI
-
-
-
-
-Cloud-based analysis, compression and storage
-
-
-
-
-
-sudo apt-get install minc-tools dicomnifti fsl-complete dcmtk itksnap
+   $ mincheader brain_mr_20080801_000000/brain_mr_20080801_000000_14e1_mri.mnc 
+   
+Note that typically the combined DICOM headers will be included in a MINC file.
