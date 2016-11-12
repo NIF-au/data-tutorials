@@ -3,6 +3,12 @@
 This tutorial should take approximately an hour, the data for the exercises is available here:
 
    
+
+You can use gitprint to download/print a PDF of this file:
+
+   
+
+   
 ## 1 Introduction to Neurodebian
 All the exercises in this tutorial will be performed in the NeuroDebian VM, in most cases this will have been done for 
 you already, if not download a copy from neuro.debian.net/vm, install VirtualBox and then import the downloaded virtualbox OVA file.
