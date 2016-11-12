@@ -145,7 +145,7 @@ We can also then dump all the headers of the files in a directory to a text file
 
 The resulting file will be just over 40,000lines of text! remember that this header information is repeated for each file.
 
-## 6 Dataset conversion between Nifti, MINC and DICOM
+## 5 Dataset conversion between Nifti, MINC and DICOM
 
 There are converters between most imaging file formats but support for all metadata differs. The most problematic is the conversion from DICOM to other formats as there is no easy way to deal with the multiple headers from multiple 2D input files that must be merged to form a 3D Nifti or MINC image.  First we can convert a DICOM series to MINC
 
@@ -182,7 +182,7 @@ There is also the dicomnifit package that allows you to convert direct from DICO
 
    $ dinifit <input-dir> <output.nii>
    
-## 5 How to anonymise (DICOM, MINC, Nifti)
+## 6 How to anonymise (DICOM, MINC, Nifti)
 
 In order to anonymise **DICOM** data we can use the dcmodify tool (from dcmtk). In the first example we will remove the Patient birth date:
 
