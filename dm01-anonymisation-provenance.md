@@ -2,13 +2,12 @@
 
 This tutorial should take approximately an hour, the data for the exercises is available here:
 
-   
+   https://github.com/NIF-au/data-tutorials/blob/master/dm01-examples.tar.gz
 
 You can use gitprint to download/print a PDF of this file:
 
-   
+   https://gitprint.com/NIF-au/data-tutorials/blob/master/dm01-anonymisation-provenance.md
 
-   
 ## 1 Introduction to Neurodebian
 All the exercises in this tutorial will be performed in the NeuroDebian VM, in most cases this will have been done for 
 you already, if not download a copy from neuro.debian.net/vm, install VirtualBox and then import the downloaded virtualbox OVA file.
@@ -19,8 +18,14 @@ As per the Neurodebian download site, the default username and password that are
     password: neurodebian
 
 The example data for this tutorial should then be downloaded within the Virtual Machine usine the inbuilt browser or via wget on the command line:
+ 
+    $ cd ~/Desktop
+    $ wget https://github.com/NIF-au/data-tutorials/blob/master/dm01-examples.tar.gz
 
-    $ wget <examples URL>
+Then unzip the example files in your NeuroDebian instance:
+
+    $ cd ~/Desktop
+    $ tar zxvf dm01-examples.tar.gz
 
 ## 2 Installing software
 Neurodebian is based upon the Debian operating system, if you've used Ubuntu before it too is based upon Debian so the 
@@ -35,6 +40,10 @@ command line (launch a terminal using the black icon from the panel launcher at 
 you could do this:
 
     $ sudo apt-get install itksnap
+    
+Check that itksnap is working by either selecting itksnap from the application menu (Applications -> NeurDebian -> Medical Imaging -> ITK-SNAP) or by launching it from the command line:
+
+    $ itksnap
 
 It is a good habit to get into using the command line to install packages as it will allow you to keep a record of which 
 packages you need for an analysis, for example to install both minc-tools and itksnap you can do this:
@@ -80,9 +89,7 @@ We can now dump all the headers of the first file as such:
 $ dcmdump BRAINIX/BRAINIX/IRM\ cérébrale\,\ neuro-crâne/T1-3D-FFE-C\ -\ 801/IM-0001-0001.dcm
 
 # Dicom-File-Format
-
 ...
-
 # Dicom-Data-Set
 # Used TransferSyntax: Little Endian Explicit
 (0008,0005) CS [ISO_IR 100]                             #  10, 1 SpecificCharacterSet
