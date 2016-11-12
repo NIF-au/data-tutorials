@@ -1,0 +1,47 @@
+# Cloud-based analysis, compression and storage
+Andrew Janke - andrew.janke@uq.edu.au
+
+This tutorial should take approximately an hour, the data for the exercises is available here:
+
+   https://github.com/NIF-au/data-tutorials/blob/master/dm01-examples.tar.gz
+
+You can use gitprint to download/print a PDF of this file:
+
+   https://gitprint.com/NIF-au/data-tutorials/blob/master/dm02-analysis-compression-storage.md
+
+
+
+Cloud-based analysis, compression and storage
+
+#7 - Differences in metadata
+      - NIFTI
+      - MINC
+      - ISMRMRD - wget https://sourceforge.net/projects/ismrmrd/files/data/simple_gre.h5
+      - https://ismrmrd.github.io/
+
+#8 - provenance in MINC file vs Nifti (no metadata so have to use script)
+
+#9 - Create releasable fileset
+   - always include code versions with data
+      - how to get the versions of packages you are using (dpkg -- list)
+   - always include parameters with data
+   - be sure to clean history from data (anonymise)
+      - perhaps best is via Nifti
+
+#9.1 - learn to script (bash)
+
+#10 - versioning
+
+#11 - Brief introduction to Licencing
+
+#12 - upload to figshare/mendelay?
+      - self host? (bad)
+      - let's use github
+
+#13 - create a simple github repo (online)
+      - intialise with files
+      - add README.md + COPYING.md
+      - Add versioning via tags
+      - Note how versioning turns into release
+
+#14 - create a DOI
