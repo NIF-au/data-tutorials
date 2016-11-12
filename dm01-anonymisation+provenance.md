@@ -6,14 +6,21 @@ This tutorial should take approximately an hour, the data for the exercises is a
 ## 1 Introduction to Neurodebian
 All the exercises in this tutorial will be performed in the NeuroDebian VM, in most cases this will have been done for 
 you already, if not download a copy from neuro.debian.net/vm, install VirtualBox and then import the downloaded virtualbox OVA file.
-The example data should then be downloaded within the Virtual Machine usine the inbuilt browser or via wget:
+
+As per the Neurodebian download site, the default username and password that are used are:
+
+    username: brain
+    password: neurodebian
+
+The example data for this tutorial should then be downloaded within the Virtual Machine usine the inbuilt browser or via wget on the command line:
 
     $ wget <examples URL>
 
-##2 Installing software
+## 2 Installing software
 Neurodebian is based upon the Debian operating system, if you've used Ubuntu before it too is based upon Debian so the 
 apt-get based install system may be familiar. There are a number of pre-installed packages in the menus, when these are
-selected for the first time they will be installed. In order to install MRview you can do this as such in the Neurodebian VM:
+selected for the first time they will be installed. In order to install MRview you only need to select the menu item and
+the software will be installed in the Neurodebian VM:
 
     Applications -> Neurodebian -> Medical Imaging -> MRview
 
@@ -35,13 +42,16 @@ packages (and versions) are currently installed using the dpkg command:
 
 This will allow you to rapidly build a list of installed software and versions that you have used in an analysis.
 
+## 3 Installing data packages
+In addition to the datasets available as part of common analysis tools (FSL, freesurfer) NeuroDebian also pacakges a number of existing atlases and other datasets as part of the packaging process. You can see the current list of datasets available here:
 
+    http://neuro.debian.net/pkglists/toc_pkgs_for_release_data.html
 
-#2 - FSL, freesurfer  neuro.debian.net
-   - How to install data http://neuro.debian.net/pkglists/toc_pkgs_for_release_data.html
+Choose a data package name that you are interested in and install it either by the `apt-get` method or by using the Synaptic Package manager in:
 
+    Applications -> System -> Synaptic Package Manager
 
-#4 - example DICOM file - structure of DICOM
+## 4 example DICOM file - structure of DICOM
 
 The DICOM medical imaging format has been used for many years in medical imaging. It is supported by most if not all medical imaging systems but is not the most widely used analysis format in research, especially in the field of brain imaging.
 
@@ -49,18 +59,19 @@ A DICOM file is nearly always a single slice of a medical imaging dataset and a 
 
 There is a typical DICOM structure from a scanning session in the DICOM-examples folder on the desktop, it consists of multiple 3D and multi-slice acquisitions. First launch a Terminal window (black icon at the bottom) and then unzip the compressed BRAINIX.zip archive:
 
-   $ cd ~/Desktop/DICOM-examples/
-   $ unzip BRAINIX.zip
+    $ cd ~/Desktop/DICOM-examples/
+    $ unzip BRAINIX.zip
 
 While viewers such as OSIRIX (OSX), Imagemagick, ImageJ and SanteDicomViewer (Windows) can view this data, we'll use the more powerfull DICOM tools in the dcmtk package to have a look at the headers.
 
 If you haven't installed the dcmtk package in neurodebian, you can do this as such:
 
-   $ sudo apt-get install dcmtk
+    $ sudo apt-get install dcmtk
 
 We can now dump all the headers of the first file as such:
 
-   $ dcmdump BRAINIX/BRAINIX/IRM\ cérébrale\,\ neuro-crâne/T1-3D-FFE-C\ -\ 801/IM-0001-0001.dcm
+````
+$ dcmdump BRAINIX/BRAINIX/IRM\ cérébrale\,\ neuro-crâne/T1-3D-FFE-C\ -\ 801/IM-0001-0001.dcm
 
 # Dicom-File-Format
 
@@ -96,33 +107,34 @@ We can now dump all the headers of the first file as such:
 (0010,0040) CS [0000]                                   #   4, 1 PatientSex
 (0010,1030) DS [0]                                     #   2, 1 PatientWeight
 (0010,21c0) US 4                                        #   2, 1 PregnancyStatus
+```
 
 Note that it contains a large amount of identifying information, DICOM is organised as a series of elements (eg: 0010,0020 refers to the PatientID), these by convention and international agreement relate to fields via what is called a DICOM dictionary, dcmdump wraps up thie process for you and outputs the elements, the value and the description.
 
 We can also then dump all the headers of the files in a directory to a text file as such:
 
-   $ dcmdump +r --scan-directories BRAINIX > dicom-headers.txt
+    $ dcmdump +r --scan-directories BRAINIX > dicom-headers.txt
 
 The resulting file will be just over 40,000lines of text! remember that this header information is repeated for each file.
 
-#5 - how to anonymise (DICOM, MINC, Nifti)
+## 5 How to anonymise (DICOM, MINC, Nifti)
 
 In order to anonymise data we can use the dcmodify tool (from dcmtk). In the first example we will remove the Patient birth date:
 
-   $ dcmodify -ea '(0010,0030)' <infile.dcm>
-
-   $ dcmodify -ie -nb -imt -gin \
-      -ea "(0010,0010)" -ea "(0010,0030)" -ea "(0008,0050)" -ea "(0020,000D)" \
-      -ea "(0020,000E)" -ea "(0008,0018)" -ea "(0008,0080)" -ea "(0008,0081)" \
-      -ea "(0008,1070)" -ea "(0008,1155)" -ea "(0010,1000)" -ea "(0020,0010)" \
-      -ea "(0020,4000)" <infile.dcm>
+    $ dcmodify -ea '(0010,0030)' <infile.dcm>
+    
+    $ dcmodify -ie -nb -imt -gin \
+       -ea "(0010,0010)" -ea "(0010,0030)" -ea "(0008,0050)" -ea "(0020,000D)" \
+       -ea "(0020,000E)" -ea "(0008,0018)" -ea "(0008,0080)" -ea "(0008,0081)" \
+       -ea "(0008,1070)" -ea "(0008,1155)" -ea "(0010,1000)" -ea "(0020,0010)" \
+       -ea "(0020,4000)" <infile.dcm>
 
 The above wll remove the most common tags that include identifying information (DatasetTitle, Patient birth date, Accession number, Study Instance UID, Series Instance UID, SOP Instance UID, Institution Name, Institution Address, Operator Name, Referenced SOP Instance UID, Other Patient Ids, Study ID and Image Comments). Note that this will have to run on each of the individual files that make up a DICOM series.
 
 Nifti data typically does not need anonymising beyond any details in the file name itself as the fixed sized header doesn't leave much space for such data. You can determine what 
 
 
-#6 - conversion to Nifti/MINC
+## 6 Dataset conversion between Nifti, MINC and DICOM
 
 #6.5 - File naming, no spaces, no blah blah
       - windows vs linux vs OSX (case sensitive)
