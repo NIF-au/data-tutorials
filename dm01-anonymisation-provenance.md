@@ -9,8 +9,10 @@ You can use gitprint to download/print a PDF of this file:
    https://gitprint.com/NIF-au/data-tutorials/blob/master/dm01-anonymisation-provenance.md
 
 ## 1 Introduction to Neurodebian
-All the exercises in this tutorial will be performed in the NeuroDebian VM, in most cases this will have been done for 
-you already, if not download a copy from neuro.debian.net/vm, install VirtualBox and then import the downloaded virtualbox OVA file.
+All the exercises in this tutorial will be performed in an instance of the NeuroDebian VM, in most cases this will have been done for 
+you already and can be run either locally via VirtualBox or on a cloud provider such as Amazon. If you don't have a running version of NeuroDebian, you can download a copy from neuro.debian.net/vm, install VirtualBox and then import the downloaded virtualbox OVA file.
+
+Note that you could also easily complete this tutorial on a desktop install of NeuroDebian or even OSX but you may need to complete the package installation via other means.
 
 As per the Neurodebian download site, the default username and password that are used are:
 
