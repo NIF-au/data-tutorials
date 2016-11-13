@@ -320,4 +320,12 @@ sGRADSPEC.sEddyCompensationX.aflAmplitude[4] = 0.000758568
 ...
 ```
 
-You can now scroll up and down using the UP and DOWN arrow keys, use Ctrl-F and Ctrl-B to move one page up/down at a time. Ntoe that this section has the capacity to also encode sensitive information and it is all hidden away in a non-standard variable that you wouldn't typically remove when anoymising DICOM. For this reason probably the best way to distribute data is in either NIFTI or MINC formats in which we know everything that is in the headers.
+You can now scroll up and down using the UP and DOWN arrow keys, use Ctrl-F and Ctrl-B to move one page up/down at a time. Ntoe that this section has the capacity to also encode sensitive information and it is all hidden away in a non-standard variable that you wouldn't typically remove when anoymising DICOM. 
+
+To exit vi press ESC (Escape) to exit search mode and then type:
+
+    :q!
+
+yes, vi is strange, but a good strange, trust me on the learn the basic functionality bit, you'll thank me when you have to debug something running on a server that is 7000km away one day.
+
+Given that DICOM is at times an unknown quantity, arguably the best way to distribute data is in either NIFTI or MINC formats in which we know everything that is in the headers.
