@@ -176,11 +176,11 @@ image dimensions: zspace yspace xspace
 
 We can then convert from MINC to Nifti:
 
-   $ mnc2nii brain_mr_20080801_000000/brain_mr_20080801_000000_14e1_mri.mnc  result.nii
+    $ mnc2nii brain_mr_20080801_000000/brain_mr_20080801_000000_14e1_mri.mnc  result.nii
    
 There is also the dicomnifit package that allows you to convert direct from DICOM to Nifto:
 
-   $ dinifit <input-dir> <output.nii>
+    $ dinifit <input-dir> <output.nii>
    
 ## 6 How to anonymise (DICOM, MINC, Nifti)
 
@@ -198,17 +198,126 @@ The above wll remove the most common tags that include identifying information (
 
 **Nifti** data typically does not need anonymising beyond any details in the file name itself as the fixed sized header doesn't leave much space for such data. You can determine what is in the header via the fslhd command:
 
-   $ . /etc/fs/fsl.sh
-   $ fslhd result.nii
+    $ . /etc/fs/fsl.sh
+    $ fslhd result.nii
 
 The only free form text field is the "descrip" field that typically contains the last command run on a file
 
 The best way to anonymise a **MINC** file is to not include the identifying information when converting
 
-   $ dcm2nii -anon <input_dir> <output_dir>
+    $ dcm2nii -anon <input_dir> <output_dir>
    
 There are MINC tools specifically written to anonymise a MINC file such as mincanon and mincclean, you can see what is in the header of a MINC file as such:
 
-   $ mincheader brain_mr_20080801_000000/brain_mr_20080801_000000_14e1_mri.mnc 
-   
-Note that typically the combined DICOM headers will be included in a MINC file.
+```
+$ mincheader brain_mr_20080801_000000/brain_mr_20080801_000000_14e1_mri.mnc
+netcdf brain_mr_20080801_000000_14e1_mri {
+dimensions:
+	zspace = 32 ;
+	yspace = 256 ;
+	xspace = 216 ;
+variables:
+	double zspace(zspace) ;
+		zspace:varid = "MINC standard variable" ;
+		zspace:vartype = "dimension____" ;
+		zspace:version = "MINC Version    1.0" ;
+		zspace:comments = "Z increases from patient inferior to superior" ;
+		zspace:spacing = "regular__" ;
+		zspace:alignment = "centre" ;
+		zspace:step = 5. ;
+		zspace:start = -49.3522932361199 ;
+		zspace:spacetype = "native____" ;
+		zspace:direction_cosines = 4.60341405991035e-17, -0.0314107603760001, 0.999506560324944 ;
+	int yspace ;
+		yspace:varid = "MINC standard variable" ;
+		yspace:vartype = "dimension____" ;
+		yspace:version = "MINC Version    1.0" ;
+		yspace:comments = "Y increases from patient posterior to anterior" ;
+		yspace:spacing = "regular__" ;
+		yspace:alignment = "centre" ;
+		yspace:step = -0.8984375 ;
+		yspace:start = 144.348985857155 ;
+		yspace:spacetype = "native____" ;
+		yspace:direction_cosines = 2.05103400000001e-10, 0.999506560324944, 0.0314107603760001 ;
+	int xspace ;
+		xspace:varid = "MINC standard variable" ;
+		xspace:vartype = "dimension____" ;
+		xspace:version = "MINC Version    1.0" ;
+		xspace:comments = "X increases from patient left to right" ;
+		xspace:spacing = "regular__" ;
+		xspace:alignment = "centre" ;
+		xspace:step = -0.8984375 ;
+		xspace:start = 94.6099424301985 ;
+		xspace:spacetype = "native____" ;
+		xspace:direction_cosines = 1., -2.050022e-10, -6.4425e-12 ;
+	short image(zspace, yspace, xspace) ;
+		image:parent = "rootvariable" ;
+		image:varid = "MINC standard variable" ;
+		image:vartype = "group________" ;
+		image:version = "MINC Version    1.0" ;
+		image:signtype = "unsigned" ;
+		image:valid_range = 0., 4095. ;
+		image:complete = "true_" ;
+		image:image-min = "--->image-min" ;
+		image:image-max = "--->image-max" ;
+	int rootvariable ;
+		rootvariable:varid = "MINC standard variable" ;
+		rootvariable:vartype = "group________" ;
+		rootvariable:version = "MINC Version    1.0" ;
+		rootvariable:parent = "" ;
+		rootvariable:children = "image\n",
+			"patient\n",
+			"study\n",
+			"acquisition\n",
+			"dicominfo\n",
+			"dicom_groups" ;
+  ...
+```
+
+Note that typically the combined DICOM headers will be included in a MINC file. You will see these further down the file.
+
+Remember that we also mentioned that differing instrument manufacturers implement the DICOM standard differently? Siemens for example has a technology called Pheonix that allows to you drop any DICOM file from a siemens instrument into the scan card on another and all the parameters will be imported. So, this means that all this information must also be in the headers. We'll now use a UNIX text editor called vi (https://en.wikipedia.org/wiki/Vi) to find it. We are going to open a DICOM file in a text editor, you could try other ones but not all interpret the binary information successfully. vi is an editor with a steep learning curve but I would encourage you to at least try to learn some basic functionality as some point as it is very easy to run over a remote connection.
+
+First we open the file:
+
+    $ vi 7T-Siemens-angio.IMA
+
+Siemens happens to encode this information in plain text in the DICOM file starting with ASCCONV, we can now search for this using vi. type the following:
+
+    /
+    
+This enters search mode, they type:
+
+    ASCCONV
+    
+and press enter, you should get to a section of the file that looks like this:
+
+```
+      <ParamBool.""save_orig"">  { ""true""  }
+    }
+  }  
+}    
+### ASCCONV BEGIN ###                                                                                                            
+ulVersion                                = 0x14b44b6
+tSequenceFileName                        = ""%SiemensSeq%\fl_tof""
+tProtocolName                            = ""TOF+AF8-3D+AF8-multi-slab""
+tReferenceImage0                         = ""1.3.12.2.1107.5.2.34.18975.2014021415554018922430014""
+tReferenceImage1                         = ""1.3.12.2.1107.5.2.34.18975.2014021416114473598633511""
+tReferenceImage2                         = ""1.3.12.2.1107.5.2.34.18975.2014021415554487212630127""
+ucScanRegionPosValid                     = 0x1
+ucTablePositioningMode                   = 0x2
+sProtConsistencyInfo.tBaselineString     = ""N4_VB17A_LATEST_20090307""
+sProtConsistencyInfo.tSystemType         = ""095""
+sProtConsistencyInfo.flNominalB0         = 6.98
+sProtConsistencyInfo.flGMax              = 40
+sProtConsistencyInfo.flRiseTime          = 5
+sProtConsistencyInfo.lMaximumNofRxReceiverChannels = 32
+sGRADSPEC.sEddyCompensationX.aflAmplitude[0] = 0.00164875
+sGRADSPEC.sEddyCompensationX.aflAmplitude[1] = -5.36951e-005
+sGRADSPEC.sEddyCompensationX.aflAmplitude[2] = 0.0055199
+sGRADSPEC.sEddyCompensationX.aflAmplitude[3] = 0.00122196
+sGRADSPEC.sEddyCompensationX.aflAmplitude[4] = 0.000758568
+...
+```
+
+You can now scroll up and down using the UP and DOWN arrow keys, use Ctrl-F and Ctrl-B to move one page up/down at a time. Ntoe that this section has the capacity to also encode sensitive information and it is all hidden away in a non-standard variable that you wouldn't typically remove when anoymising DICOM. For this reason probably the best way to distribute data is in either NIFTI or MINC formats in which we know everything that is in the headers.
