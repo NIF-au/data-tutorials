@@ -14,6 +14,10 @@ you already and can be run either locally via VirtualBox or on a cloud provider 
 
 Note that you could also easily complete this tutorial on a desktop install of NeuroDebian or even OSX but you may need to complete the package installation via other means.
 
+To get started with NeuroDebian, follow the instructions here:
+
+   http://neuro.debian.net/vm.html
+
 As per the Neurodebian download site, the default username and password that are used are:
 
     username: brain
