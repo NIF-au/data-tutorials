@@ -23,7 +23,7 @@ As per the Neurodebian download site, the default username and password that are
     username: brain
     password: neurodebian
 
-The example data for this tutorial should then be downloaded within the Virtual Machine usine the inbuilt browser or via wget on the command line:
+The example data for this tutorial should then be downloaded within the Virtual Machine usine the inbuilt browser or via wget on the command line (use the Terminal application -- Aplications -> System -> XFCE Terminal):
  
     $ cd ~/Desktop
     $ wget https://github.com/NIF-au/data-tutorials/raw/master/dm01-examples.tar.gz
